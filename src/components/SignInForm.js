@@ -11,6 +11,15 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 
+import Auth from './Auth';
+import { CognitoUserPool } from "amazon-cognito-identity-js";
+import {
+  poolData,
+  identityPoolId,
+  region,
+} from "../env";
+import AWS from "aws-sdk";
+
 const useStyles = makeStyles(theme => ({
   "@global": {
     body: {
@@ -36,11 +45,33 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+
+
+
+const userPool = new CognitoUserPool(poolData);
+const credentials = new AWS.CognitoIdentityCredentials({
+  IdentityPoolId: identityPoolId
+});
+
+AWS.config.update({
+  region: region,
+  credentials: credentials
+});
+
+
+const auth = new Auth(userPool, credentials);
+
 export default function SignInForm() {
   const classes = useStyles();
-    const [email, setEmail] = useState("");
+    const [login, setLogin] = useState("");
     const [password, setPassword] = useState("");
- 
+
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      console.log(login)
+      debugger;
+      auth.signInUser(login, password)
+    }
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -51,19 +82,19 @@ export default function SignInForm() {
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
-        <form className={classes.form} noValidate>
+        <form onSubmit={handleSubmit} className={classes.form} noValidate>
           <TextField
             variant="outlined"
             margin="normal"
             required
             fullWidth
-            id="email"
-            label="Email Address"
-            name="email"
-            autoComplete="email"
+            id="login"
+            label="Login"
+            name="login"
+            autoComplete="login"
             autoFocus
-            value={email}
-            onChange={e => setEmail(e.target.value)}
+            value={login}
+            onChange={e => setLogin(e.target.value)}
           />
           <TextField
             variant="outlined"

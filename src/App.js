@@ -1,9 +1,10 @@
 import React from 'react';
 import './App.css';
 import NavBar from './components/navbar';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route} from "react-router-dom";
 import SignUpForm from './components/SignUpForm';
 import SignInForm from './components/SignInForm';
+
 
 function App() {
   return (
