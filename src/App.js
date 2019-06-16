@@ -1,31 +1,69 @@
 import React from "react";
 import "./App.css";
 import NavBar from "./components/navbar";
-import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
-import SignUpForm from "./components/SignUpForm";
-import SignInForm from "./components/SignInForm";
+import { BrowserRouter as Router, withRouter } from "react-router-dom";
 import Home from "./components/Home";
-import Auth from "./components/Auth"
-import { PrivateRoute } from "./components/auth/protected.route";
-const auth = new Auth()
-console.log(auth);
+import Routes from "./components/Routes";
+import Auth from './components/auth/Auth'
+import AWS from "aws-sdk";
+import { CognitoUserPool } from "amazon-cognito-identity-js";
+import { poolData, identityPoolId, region, bucketRegion, bucketName } from './env.js';
+const userPool = new CognitoUserPool(poolData);
 
+const creds = new AWS.CognitoIdentityCredentials({
+    IdentityPoolId: identityPoolId
+});
+const s3 = new AWS.S3({
+    apiVersion: '2006-03-01',
+    region: bucketRegion,
+    params: {
+        Bucket: bucketName
+    }
+});
+AWS.config.update({
+    region: region,
+    credentials: creds
+});
 
-export default class App extends React.Component {
-  state = {
-    isLogged: false,
+const auth = new Auth(userPool, creds);
+
+ export default class App extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      isAuthenticated: false
+    };
   }
 
-  render(){
-  return (
-    <div className="App">
-      <Router>
-        <NavBar />
-        <Route path="/login" exact component={SignInForm} />
-        <Route path="/register" exact component={SignUpForm} />
-        <PrivateRoute path="/home" exact component={Home} />
-      </Router>
-    </div>
-  );
+  userHasAuthenticated = authenticated => {
+    this.setState({
+      isAuthenticated: authenticated
+    });
+  };
+
+  handleLogout = async event => {
+    debugger;
+    await auth.logOut();
+    this.userHasAuthenticated(false);
+    debugger;
+  };
+
+  render() {
+    const childProps = {
+      isAuthenticated: this.state.isAuthenticated,
+      userHasAuthenticated: this.userHasAuthenticated
+    };
+    return (
+      <div className="App">
+        <Router>
+          <NavBar
+            handleLogout={this.handleLogout}
+            isAuthenticated={this.state.isAuthenticated}
+          />
+          <Routes childProps={childProps} />
+        </Router>
+      </div>
+    );
   }
 }

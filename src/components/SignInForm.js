@@ -11,10 +11,11 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 
-import Auth from "./Auth";
+// import Auth from "./Auth";
 import { CognitoUserPool } from "amazon-cognito-identity-js";
 import { poolData, identityPoolId, region } from "../env";
 import AWS from "aws-sdk";
+import Auth from './auth/Auth'
 
 const useStyles = makeStyles(theme => ({
   "@global": {
@@ -40,18 +41,11 @@ const useStyles = makeStyles(theme => ({
     margin: theme.spacing(3, 0, 2)
   }
 }));
-
-const userPool = new CognitoUserPool(poolData);
-const credentials = new AWS.CognitoIdentityCredentials({
+const creds = new AWS.CognitoIdentityCredentials({
   IdentityPoolId: identityPoolId
 });
-  const cognitoUser = userPool.getCurrentUser();
-AWS.config.update({
-  region: region,
-  credentials: credentials
-});
-
-const auth = new Auth(userPool, credentials, cognitoUser);
+const userPool = new CognitoUserPool(poolData);
+const auth = new Auth(userPool, creds);
 
 export default function SignInForm(props) {
   const classes = useStyles();
@@ -60,16 +54,16 @@ export default function SignInForm(props) {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    console.log(login);
-    debugger;
-     auth.signInUser(login, password);
-   auth.isAuthenticated();
-debugger;
-    if (auth.authenicated) {
+    try {
+      await auth.signInUser(login, password);
       debugger;
-      props.history.push("/home");
+      props.userHasAuthenticated(true);
+     props.history.push("/home");
+      console.log(props)
+    } catch (e) {
+       props.userHasAuthenticated(false);
+      console.log(e)
     }
-
   };
   return (
     <Container component="main" maxWidth="xs">
