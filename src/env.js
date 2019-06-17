@@ -8,6 +8,7 @@ const poolData = {
   UserPoolId: "eu-west-1_BuFvMskGo",
   ClientId: "60e0k1u4i8cvf943j9rp80532c"
 };
+const animationApiGatewayUrl = '';
 
 export {
   region,
@@ -15,5 +16,6 @@ export {
   loginProviderName,
   poolData,
   bucketRegion,
-  bucketName
+  bucketName,
+  animationApiGatewayUrl
 };

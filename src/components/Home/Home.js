@@ -1,6 +1,8 @@
 import React from "react";
 import { useDropzone } from "react-dropzone";
 import "./home.scss";
+import { animationApiGatewayUrl } from "../../env";
+
 export default function Home(props) {
   const {
     acceptedFiles,
@@ -23,7 +25,11 @@ export default function Home(props) {
     </li>
   ));
 
-  return (
+  const sendPhotos = () => {
+    
+  }
+
+  return (<div>
     <section className="container">
       <div>
         <h1>Animation creator</h1>
@@ -43,6 +49,10 @@ export default function Home(props) {
         <h4>Rejected files</h4>
         <ul>{rejectedFilesItems}</ul>
       </aside>
+
     </section>
+          <button onClick={sendPhotos}>Send file</button>
+    </div>
+          
   );
 }
