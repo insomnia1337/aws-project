@@ -35,8 +35,9 @@ export default class Auth extends React.Component {
 
   signUpUser(data) {
     return new Promise((resolve, reject) => {
+      debugger;
       this.userPool.signUp(
-        data.userName,
+        data.username,
         data.password,
         [
           new CognitoUserAttribute({
@@ -52,9 +53,9 @@ export default class Auth extends React.Component {
         (err, result) => {
           if (err) {
             console.log(err);
-
             return;
           }
+          resolve()
           console.log(`Udało się. Username: ${result.user.getUsername()}`);
         }
       );
@@ -62,6 +63,7 @@ export default class Auth extends React.Component {
   }
 
   confirm(data) {
+    return new Promise((resolve, reject) => {
     const cognitoUser = new CognitoUser({
       Username: data.username,
       Pool: this.userPool
@@ -73,12 +75,13 @@ export default class Auth extends React.Component {
       (err, result) => {
       if (err) {
         console.log(err);
+        console.log("Niepoprawny KOD");
         return;
       }
-      console.log("sukces potwierdzenie");
+      resolve()
     });
-  }
-
+  })
+}
   logOut() {
     const cognitoUser = this.userPool.getCurrentUser();
     if (cognitoUser != null) {

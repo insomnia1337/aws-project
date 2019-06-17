@@ -87,43 +87,43 @@ export default function SignUpForm(props) {
   const handleSubmit = async event => {
     debugger;
     event.preventDefault();
-    // if (!validateForm()) {
-    //   return alert('Niepoprawne dane')
-    // }
+    if (!validateForm()) {
+      return alert("Niepoprawne dane");
+    }
     try {
+      debugger;
       await auth.signUpUser({
         username: login,
         password: password,
         email: email
       });
-      props.userHasAuthenticated(true);
-      setNewUser("ok");
+      setNewUser("test");
     } catch (e) {
       alert(e.message);
     }
   };
 
-  const handleConfirmationSubmit = () => {
-    if(!validateConfirmationForm()){
-      return
+  const handleConfirmationSubmit = async event => {
+    event.preventDefault();
+    if (!validateConfirmationForm()) {
+      return;
     }
-      auth.confirm(
-        {
-          username: login,
-          code: confirmationCode
-        },
-        () => {
-          this.user.isCodeRequired = false;
-        },
-        err => (this.user.flashMessage = err)
-      );
-    console.log("confirm");
+    try {
+     await auth.confirm({
+        username: login,
+        code: confirmationCode
+      });
+      props.history.push('/')
+      
+    } catch (event) {
+      console.log(event.message);
+    }
   };
 
   const renderConfirmationForm = () => {
     return (
       <form onSubmit={handleConfirmationSubmit}>
-        <input type="tel" value={confirmationCode} onChange={handleChange} />
+        <input value={confirmationCode} onChange={handleChange} />
         <button>Confirm code</button>
         <div>Please check your email for the code.</div>
       </form>
