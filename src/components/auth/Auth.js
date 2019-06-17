@@ -3,7 +3,6 @@ import {
   CognitoUser,
   CognitoUserAttribute
 } from "amazon-cognito-identity-js";
-import { loginProviderName } from "../../env.js";
 import React from "react";
 
 export default class Auth extends React.Component {
@@ -55,7 +54,7 @@ export default class Auth extends React.Component {
             console.log(err);
             return;
           }
-          resolve()
+          resolve();
           console.log(`Udało się. Username: ${result.user.getUsername()}`);
         }
       );
@@ -64,24 +63,26 @@ export default class Auth extends React.Component {
 
   confirm(data) {
     return new Promise((resolve, reject) => {
-    const cognitoUser = new CognitoUser({
-      Username: data.username,
-      Pool: this.userPool
-    });
+      const cognitoUser = new CognitoUser({
+        Username: data.username,
+        Pool: this.userPool
+      });
 
-    cognitoUser.confirmRegistration(
-      data.code, 
-      true, 
-      (err, result) => {
-      if (err) {
-        console.log(err);
-        console.log("Niepoprawny KOD");
-        return;
-      }
-      resolve()
+      cognitoUser.confirmRegistration(data.code, true, (err, result) => {
+        if (err) {
+          console.log(err);
+          console.log("Niepoprawny KOD");
+          return;
+        }
+        resolve();
+      });
     });
-  })
-}
+  }
+
+  getIdentityId() {
+    return this.credentials.identityId;
+  }
+  
   logOut() {
     const cognitoUser = this.userPool.getCurrentUser();
     if (cognitoUser != null) {
