@@ -32,31 +32,33 @@ export default class Auth extends React.Component {
       });
     });
   }
-  
-  signUpUser(data) {
-    this.userPool.signUp(
-      data.userName,
-      data.password,
-      [
-        new CognitoUserAttribute({
-          Name: "email",
-          Value: data.email
-        }),
-        new CognitoUserAttribute({
-          Name: "name",
-          Value: data.name
-        })
-      ],
-      null,
-      (err, result) => {
-        if (err) {
-          console.log(err);
 
-          return;
+  signUpUser(data) {
+    return new Promise((resolve, reject) => {
+      this.userPool.signUp(
+        data.userName,
+        data.password,
+        [
+          new CognitoUserAttribute({
+            Name: "email",
+            Value: data.email
+          }),
+          new CognitoUserAttribute({
+            Name: "name",
+            Value: data.name
+          })
+        ],
+        null,
+        (err, result) => {
+          if (err) {
+            console.log(err);
+
+            return;
+          }
+          console.log(`Udało się. Username: ${result.user.getUsername()}`);
         }
-        console.log(`Udało się. Username: ${result.user.getUsername()}`);
-      }
-    );
+      );
+    });
   }
 
   confirm(data) {
@@ -65,7 +67,10 @@ export default class Auth extends React.Component {
       Pool: this.userPool
     });
 
-    cognitoUser.confirmRegistration(data.code, true, (err, result) => {
+    cognitoUser.confirmRegistration(
+      data.code, 
+      true, 
+      (err, result) => {
       if (err) {
         console.log(err);
         return;

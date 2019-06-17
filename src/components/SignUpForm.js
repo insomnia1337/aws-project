@@ -73,136 +73,161 @@ export default function SignUpForm(props) {
   const [confirmationCode, setConfirmationCode] = useState("");
   const [newUser, setNewUser] = useState("");
 
-  const handleSubmit = async event => {
-    event.preventDefault();
-
-    try {
-      debugger;
-      const newUser = await auth.signUpUser({
-        username: login,
-        password: password
-      });
-      setNewUser(newUser);
-    } catch (e) {
-      alert(e.message);
-    }
-  };
-
   const validateForm = () => {
-    return (
-      login.length > 0 && password.length > 0 && password === password2
-    );
+    return login.length > 0 && password.length > 0 && password === password2;
   };
   const validateConfirmationForm = () => {
     return confirmationCode.length > 0;
   };
 
-  const handleConfirmationSubmit = async event => {
+  const handleChange = e => {
+    setConfirmationCode(e.target.value);
+  };
+
+  const handleSubmit = async event => {
+    debugger;
     event.preventDefault();
-
+    // if (!validateForm()) {
+    //   return alert('Niepoprawne dane')
+    // }
     try {
-      await auth.signUpUser(login, confirmationCode);
-      await auth.signIn(login, password);
-
+      await auth.signUpUser({
+        username: login,
+        password: password,
+        email: email
+      });
       props.userHasAuthenticated(true);
-      props.history.push("/login");
+      setNewUser("ok");
     } catch (e) {
       alert(e.message);
-      this.setState({ isLoading: false });
     }
   };
 
+  const handleConfirmationSubmit = () => {
+    if(!validateConfirmationForm()){
+      return
+    }
+      auth.confirm(
+        {
+          username: login,
+          code: confirmationCode
+        },
+        () => {
+          this.user.isCodeRequired = false;
+        },
+        err => (this.user.flashMessage = err)
+      );
+    console.log("confirm");
+  };
+
+  const renderConfirmationForm = () => {
+    return (
+      <form onSubmit={handleConfirmationSubmit}>
+        <input type="tel" value={confirmationCode} onChange={handleChange} />
+        <button>Confirm code</button>
+        <div>Please check your email for the code.</div>
+      </form>
+    );
+  };
+
+  const renderForm = () => {
+    return (
+      <Container component="main" maxWidth="xs">
+        <CssBaseline />
+        <div className={classes.paper}>
+          <Avatar className={classes.avatar}>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5">
+            Sign up
+          </Typography>
+          <form className={classes.form} onSubmit={handleSubmit}>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  autoComplete="fname"
+                  name="login"
+                  variant="outlined"
+                  required
+                  fullWidth
+                  id="login"
+                  label="Login"
+                  autoFocus
+                  value={login}
+                  onChange={e => setLogin(e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  variant="outlined"
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  variant="outlined"
+                  required
+                  fullWidth
+                  name="password"
+                  label="Password"
+                  type="password"
+                  id="password"
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  variant="outlined"
+                  required
+                  fullWidth
+                  name="password2"
+                  label="Repeat password"
+                  type="password"
+                  id="password2"
+                  autoComplete="current-password"
+                  value={password2}
+                  onChange={e => setPassword2(e.target.value)}
+                />
+              </Grid>
+            </Grid>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              className={classes.submit}
+            >
+              Sign Up
+            </Button>
+            <Grid container justify="flex-end">
+              <Grid item>
+                <Link
+                  style={{ textDecoration: "none" }}
+                  to="/login"
+                  variant="body2"
+                >
+                  Already have an account? Sign in
+                </Link>
+              </Grid>
+            </Grid>
+          </form>
+        </div>
+      </Container>
+    );
+  };
   return (
-    <Container component="main" maxWidth="xs">
-      <CssBaseline />
-      <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography component="h1" variant="h5">
-          Sign up
-        </Typography>
-        <form className={classes.form} onSubmit={handleConfirmationSubmit}>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                autoComplete="fname"
-                name="login"
-                variant="outlined"
-                required
-                fullWidth
-                id="login"
-                label="Login"
-                autoFocus
-                value={login}
-                onChange={e => setLogin(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                name="password"
-                label="Password"
-                type="password"
-                id="password"
-                autoComplete="current-password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                name="password2"
-                label="Repeat password"
-                type="password2"
-                id="password2"
-                autoComplete="current-password"
-                value={password2}
-                onChange={e => setPassword2(e.target.value)}
-              />
-            </Grid>
-          </Grid>
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            className={classes.submit}
-            onClick={handleSubmit}
-          >
-            Sign Up
-          </Button>
-          <Grid container justify="flex-end">
-            <Grid item>
-              <Link
-                style={{ textDecoration: "none" }}
-                to="/login"
-                variant="body2"
-              >
-                Already have an account? Sign in
-              </Link>
-            </Grid>
-          </Grid>
-        </form>
-      </div>
-    </Container>
+    <div className="signup">
+      {!newUser ? renderForm() : renderConfirmationForm()}
+    </div>
   );
 }
