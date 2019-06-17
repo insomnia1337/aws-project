@@ -1,5 +1,6 @@
 import React from "react";
 import { useDropzone } from "react-dropzone";
+import {Redirect} from 'react-router-dom'
 import "./home.scss";
 import {
   animationApiGatewayUrl,
@@ -53,33 +54,69 @@ export default function Home(props) {
     e.preventDefault();
     const timestamp = Date.now();
     const path = `uek-krakow/${timestamp}/`;
+    const promises = [];
 
-    for (let i=0; i< acceptedFilesItems.length; i++ ){
-      const acceptedFilesItem = acceptedFilesItems[i]
-    
-    new Promise((resolve, reject) => {
-      debugger;
-      s3.putObject(
-        {
-          Key: `${path}${acceptedFilesItem.key}`,
-          ContentType: "image/jpeg",
-          Body: acceptedFilesItem
-        },
-        (err, data) => {
-          if (err) {
-            console.log(err);
-            reject(err);
-          } else {
-            resolve(data);
+    for (let i = 0; i < acceptedFilesItems.length; i++) {
+      const acceptedFilesItem = acceptedFilesItems[i];
+
+      promises.push(
+        new Promise((resolve, reject) => {
+          debugger;
+          s3.putObject(
+            {
+              Key: `${path}${acceptedFilesItem.key}`,
+              ContentType: "image/jpeg",
+              Body: acceptedFilesItem
+            },
+            (err, data) => {
+              if (err) {
+                console.log(err);
+                reject(err);
+              } else {
+                resolve(data);
+              }
+            }
+          );
+          resolve("ok"); // tmp
+        })
+      );
+      Promise.all(promises).then(values => {
+        console.log(values);
+        console.log("wyslano pomyslnie");
+        const order_id = uuidv4();
+        const email = "test@wp.pl";
+        const photos = acceptedFilesItems.map(x => `${path}${x.name}`);
+        const orderRequest = {
+          order_id,
+          email,
+          photos
+        };
+        console.log(orderRequest);
+        fetch("animationApiGatewayUrl", {
+          method: "post",
+          body: JSON.stringify(orderRequest),
+          mode: "no-cors",
+          headers: {
+            "Content-Type": "application/json"
           }
-    })
-      resolve("ok"); // tmp
-    })
-  }
-}
-    
+        })
+          .then(res => res.text()) // response pusty
+          .then(response => {
+            console.log("Wys;ame");
+            console.log(response);
+          });
+      });
+    }
+  };
 
-  return (
+  const blocked = () => {
+    return (
+      <Redirect to='/' />
+    )
+  }
+
+  const homeTemplate = () => {
+    return (
     <div>
       <section className="container">
         <div>
@@ -103,5 +140,9 @@ export default function Home(props) {
       </section>
       <button onClick={sendPhotos}>Send file</button>
     </div>
-  );
+
+    )
+  }
+return <div>{props.isAuthenticated ? homeTemplate() : blocked()}</div>;
+  
 }
