@@ -11,7 +11,7 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-import Auth from "./auth/Auth";
+import Auth from "../auth/Auth";
 import { CognitoUserPool } from "amazon-cognito-identity-js";
 import {
   poolData,
@@ -19,7 +19,7 @@ import {
   region,
   bucketRegion,
   bucketName
-} from "./../env";
+} from "../../env";
 const userPool = new CognitoUserPool(poolData);
 
 const creds = new AWS.CognitoIdentityCredentials({

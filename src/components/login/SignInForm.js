@@ -13,9 +13,9 @@ import Container from "@material-ui/core/Container";
 
 // import Auth from "./Auth";
 import { CognitoUserPool } from "amazon-cognito-identity-js";
-import { poolData, identityPoolId, region } from "../env";
+import { poolData, identityPoolId, region } from "../../env";
 import AWS from "aws-sdk";
-import Auth from "./auth/Auth";
+import Auth from "../auth/Auth";
 
 const useStyles = makeStyles(theme => ({
   "@global": {
