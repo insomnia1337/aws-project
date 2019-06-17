@@ -15,7 +15,7 @@ import Container from "@material-ui/core/Container";
 import { CognitoUserPool } from "amazon-cognito-identity-js";
 import { poolData, identityPoolId, region } from "../env";
 import AWS from "aws-sdk";
-import Auth from './auth/Auth'
+import Auth from "./auth/Auth";
 
 const useStyles = makeStyles(theme => ({
   "@global": {
@@ -56,13 +56,12 @@ export default function SignInForm(props) {
     e.preventDefault();
     try {
       await auth.signInUser(login, password);
-      debugger;
       props.userHasAuthenticated(true);
-     props.history.push("/home");
-      console.log(props)
+      props.history.push("/home");
+      console.log(props);
     } catch (e) {
-       props.userHasAuthenticated(false);
-      console.log(e)
+      props.userHasAuthenticated(false);
+      console.log(e);
     }
   };
   return (

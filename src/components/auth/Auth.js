@@ -12,31 +12,27 @@ export default class Auth extends React.Component {
     this.cognitoUser = cognitoUser;
     this.userPool = userPool;
     this.credentials = credentials;
-    this.authenicated = false;
   }
 
   signInUser(userName, password) {
-    const authenticationDetails = new AuthenticationDetails({
-      Username: userName,
-      Password: password
-    });
+    return new Promise((resolve, reject) => {
+      const authenticationDetails = new AuthenticationDetails({
+        Username: userName,
+        Password: password
+      });
 
-    const cognitoUser = new CognitoUser({
-      Username: userName,
-      Pool: this.userPool
-    });
-    cognitoUser.authenticateUser(authenticationDetails, {
-      onSuccess: result => {
-        console.log("nice logged");
-      },
-      onFailure: err => {
-        this.authenicated = false;
-        console.log(err);
-        // alert(err);
-      }
+      const cognitoUser = new CognitoUser({
+        Username: userName,
+        Pool: this.userPool
+      });
+
+      cognitoUser.authenticateUser(authenticationDetails, {
+        onSuccess: resolve,
+        onFailure: reject
+      });
     });
   }
-
+  
   signUpUser(data) {
     this.userPool.signUp(
       data.userName,
