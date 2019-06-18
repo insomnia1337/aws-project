@@ -1,12 +1,13 @@
 import React from "react";
 import "./App.css";
 import NavBar from "./components/navbar";
-import { BrowserRouter as Router, withRouter } from "react-router-dom";
+import { BrowserRouter as Router } from "react-router-dom";
 import Routes from "./components/Routes";
 import Auth from './components/auth/Auth'
 import AWS from "aws-sdk";
 import { CognitoUserPool } from "amazon-cognito-identity-js";
 import { poolData, identityPoolId, region, bucketRegion, bucketName } from './env.js';
+import StickyFooter from "./components/footer/footer";
 const userPool = new CognitoUserPool(poolData);
 
 
@@ -57,6 +58,7 @@ const auth = new Auth(userPool, creds);
           />
           <Routes childProps={childProps} />
         </Router>
+          <StickyFooter/>
       </div>
     );
   }

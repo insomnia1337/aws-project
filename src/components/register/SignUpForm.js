@@ -85,13 +85,11 @@ export default function SignUpForm(props) {
   };
 
   const handleSubmit = async event => {
-    debugger;
     event.preventDefault();
     if (!validateForm()) {
-      return alert("Niepoprawne dane");
+      return alert("Wpisane dane są niepoprawne.");
     }
     try {
-      debugger;
       await auth.signUpUser({
         username: login,
         password: password,
@@ -122,11 +120,35 @@ export default function SignUpForm(props) {
 
   const renderConfirmationForm = () => {
     return (
+        <Container style={{marginTop: '64px'}}component="main" maxWidth="xs">
       <form onSubmit={handleConfirmationSubmit}>
-        <input value={confirmationCode} onChange={handleChange} />
-        <button>Confirm code</button>
+        <Grid item xs={12}>
+        <TextField
+            autoComplete="fname"
+            name="Type your code"
+            variant="outlined"
+            required
+            fullWidth
+            label="Type your code"
+            autoFocus
+            value={confirmationCode}
+            onChange={handleChange}
+        />
+        </Grid>
+        <Grid item xs={12}>
+        <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            className={classes.submit}
+        >
+         Confirm code
+        </Button>
+        </Grid>
         <div>Please check your email for the code.</div>
       </form>
+        </Container>
     );
   };
 
